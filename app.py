@@ -1,8 +1,3 @@
-bash
-
-cat /home/claude/app_final.py
-Output
-
 import streamlit as st
 import anthropic
 import os
