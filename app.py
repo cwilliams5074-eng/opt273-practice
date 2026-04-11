@@ -83,7 +83,7 @@ Competency items: {COMPETENCY_ITEMS}
 Transcript:
 {transcript}
 
-Respond ONLY with valid JSON, no markdown:
+Respond ONLY with valid JSON, no markdown or code blocks:
 {{
   "score": <0-100>,
   "covered": [<items covered>],
@@ -100,6 +100,35 @@ Respond ONLY with valid JSON, no markdown:
     raw = response.content[0].text
     clean = raw.replace("```json", "").replace("```", "").strip()
     return json.loads(clean)
+
+def build_download_text(student_name, patient_name, mode, messages, fb, now, exchanges):
+    transcript = "\n\n".join([f"{'STUDENT' if m['role'] == 'user' else 'PATIENT'}: {m['content']}" for m in messages])
+    total = len(fb["covered"]) + len(fb["missed"])
+    pct = round(len(fb["covered"]) / total * 100) if total > 0 else 0
+    covered_lines = "\n".join(["COVERED: " + i for i in fb["covered"]])
+    missed_lines = "\n".join(["MISSED: " + i for i in fb["missed"]])
+    return f"""OPT 273 — Contact Lens Fitting Simulator
+{mode}
+{"Student: " + student_name if student_name else ""}
+Patient: {patient_name}
+Date: {now}
+Exchanges: {exchanges}
+
+SCORE: {fb["score"]}/100
+ITEMS COVERED: {len(fb["covered"])}/{total}
+COMPETENCY: {pct}%
+
+COMPETENCY CHECKLIST (2a-2d)
+{covered_lines}
+{missed_lines}
+
+FEEDBACK
+What you did well: {fb["praise"]}
+Areas to improve: {fb["improvement"]}
+Tip for next time: {fb["tip"]}
+
+TRANSCRIPT
+{transcript}"""
 
 def send_message(msg, session_key, system_prompt):
     st.session_state[session_key].append({"role": "user", "content": msg})
@@ -125,26 +154,21 @@ if mode == "Practice":
         st.session_state.practice_messages = [{"role": "assistant", "content": patient["greeting"]}]
         st.session_state.practice_patient = patient_name
         st.session_state.practice_feedback = None
-        st.session_state.practice_input = ""
 
-    # Chat history
     for msg in st.session_state.practice_messages:
         with st.chat_message("assistant" if msg["role"] == "assistant" else "user"):
             st.write(msg["content"])
 
-    # Quick prompts
     st.markdown("**Quick prompts**")
     cols = st.columns(2)
     for i, prompt_text in enumerate(QUICK_PROMPTS):
         if cols[i % 2].button(prompt_text, key=f"qp_{i}"):
             send_message(prompt_text, "practice_messages", patient["profile"])
 
-    # Free text input
     st.markdown("")
     if user_input := st.chat_input("Or type your own question…"):
         send_message(user_input, "practice_messages", patient["profile"])
 
-    # Action buttons
     st.markdown("")
     col1, col2 = st.columns(2)
     with col1:
@@ -161,7 +185,6 @@ if mode == "Practice":
                 with st.spinner("Analyzing your interview…"):
                     st.session_state.practice_feedback = get_feedback(st.session_state.practice_messages)
 
-    # Feedback
     if st.session_state.get("practice_feedback"):
         fb = st.session_state.practice_feedback
         st.markdown("---")
@@ -184,6 +207,11 @@ if mode == "Practice":
         st.markdown(f"**Tip for next time:** {fb['tip']}")
         st.info("You can keep practicing and request feedback again at any time.")
 
+        now = datetime.now().strftime("%B %d, %Y at %I:%M %p")
+        exchanges = len([m for m in st.session_state.practice_messages if m["role"] == "user"])
+        download_text = build_download_text("", patient_name, "Practice Session", st.session_state.practice_messages, fb, now, exchanges)
+        st.download_button("Download transcript & feedback", data=download_text, file_name="opt273-practice-transcript.txt", mime="text/plain", use_container_width=True)
+
 # ══════════════════════════════════════════════
 # GRADED MODE
 # ══════════════════════════════════════════════
@@ -203,7 +231,7 @@ else:
         st.markdown("""
 - No prompt suggestions — questions are up to you
 - Feedback and submission record generated at the end
-- Screenshot or copy your record to submit in Canvas
+- Download your record to submit in Canvas
         """)
         name = st.text_input("Your name (for submission record)")
         if st.button("Begin exam →", type="primary"):
@@ -246,6 +274,8 @@ else:
         fb = st.session_state.graded_feedback
         now = datetime.now().strftime("%B %d, %Y at %I:%M %p")
         user_msgs = [m for m in st.session_state.graded_messages if m["role"] == "user"]
+        total = len(fb["covered"]) + len(fb["missed"])
+        pct = round(len(fb["covered"]) / total * 100) if total > 0 else 0
 
         col1, col2 = st.columns(2)
         col1.markdown(f"**Student:** {st.session_state.graded_name}")
@@ -254,8 +284,6 @@ else:
         col2.markdown(f"**Exchanges:** {len(user_msgs)}")
 
         st.markdown("---")
-        total = len(fb["covered"]) + len(fb["missed"])
-        pct = round(len(fb["covered"]) / total * 100) if total > 0 else 0
         col1, col2, col3 = st.columns(3)
         col1.metric("Score", f"{fb['score']}/100")
         col2.metric("Items covered", f"{len(fb['covered'])}/{total}")
@@ -272,7 +300,7 @@ else:
         st.markdown(f"**Tip for next time:** {fb['tip']}")
 
         st.markdown("---")
-        st.markdown("**Interview transcript**")
-        transcript = "\n\n".join([f"{'STUDENT' if m['role'] == 'user' else 'PATIENT'}: {m['content']}" for m in st.session_state.graded_messages])
-        st.text_area("Copy this to submit to your instructor", transcript, height=300)
-        st.caption("Screenshot this page or copy the transcript to paste into your Canvas submission.")
+        download_text = build_download_text(st.session_state.graded_name, GRADED_PATIENT["name"], "Graded Assignment", st.session_state.graded_messages, fb, now, len(user_msgs))
+        filename = f"opt273-graded-{st.session_state.graded_name.replace(' ', '-').lower()}.txt"
+        st.download_button("Download submission record", data=download_text, file_name=filename, mime="text/plain", use_container_width=True)
+        st.caption("Download and upload this file to your Canvas assignment submission.")
