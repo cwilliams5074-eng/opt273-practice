@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Lens Fitting Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f3ef;
+    --surface: #ffffff;
+    --surface2: #f0ede8;
+    --border: #e0dbd3;
+    --border2: #c8c0b5;
+    --text: #1a1714;
+    --text2: #6b6560;
+    --text3: #9c9590;
+    --accent: #2d5a8e;
+    --accent-light: #e8f0f8;
+    --accent-text: #1a3d66;
+    --green: #2a6b4a;
+    --green-light: #e8f4ee;
+    --green-text: #1a4a30;
+    --amber: #7a4f1a;
+    --amber-light: #faf0e0;
+    --amber-text: #5a3810;
+    --red: #8e2d2d;
+    --red-light: #f8e8e8;
+    --radius: 10px;
+    --radius-lg: 14px;
+    --font: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; line-height: 1.6; }
+  .shell { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  /* ── Mode switcher ── */
+  .mode-switcher { display: flex; gap: 0; margin-bottom: 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 4px; width: fit-content; }
+  .mode-switch-btn { font-family: var(--font); font-size: 13px; font-weight: 500; padding: 7px 20px; border-radius: calc(var(--radius-lg) - 2px); border: none; background: transparent; color: var(--text2); cursor: pointer; transition: all 0.15s; }
+  .mode-switch-btn.active { background: var(--accent); color: white; }
+  .mode-switch-btn.graded.active { background: var(--amber); color: white; }
+
+  /* ── Header ── */
+  .header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.75rem; gap: 1rem; flex-wrap: wrap; }
+  .header-left h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.4px; }
+  .header-left p { font-size: 13px; color: var(--text2); margin-top: 3px; }
+  .header-badge { font-family: var(--mono); font-size: 11px; padding: 4px 10px; border-radius: 999px; background: var(--accent-light); color: var(--accent-text); border: 1px solid #c0d4ec; white-space: nowrap; margin-top: 4px; }
+  .header-badge.graded { background: var(--amber-light); color: var(--amber-text); border-color: #e8d0a0; }
+
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+
+  /* ── Panels ── */
+  #practicePanel, #gradedPanel { display: none; }
+  #practicePanel.visible, #gradedPanel.visible { display: block; }
+
+  /* ── Graded start screen ── */
+  .start-screen { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 2rem; max-width: 480px; margin: 0 auto; }
+  .start-screen h2 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+  .start-screen p { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 1.5rem; }
+  .start-rules { list-style: none; margin-bottom: 1.75rem; }
+  .start-rules li { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; color: var(--text2); padding: 6px 0; border-bottom: 1px solid var(--border); }
+  .start-rules li:last-child { border-bottom: none; }
+  .rule-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .name-input-wrap { margin-bottom: 1.25rem; }
+  .name-input-wrap label { font-size: 13px; font-weight: 500; color: var(--text2); display: block; margin-bottom: 6px; }
+  .name-input-wrap input { width: 100%; font-family: var(--font); font-size: 14px; padding: 10px 14px; border-radius: var(--radius); border: 1.5px solid var(--border); background: var(--bg); color: var(--text); transition: border-color 0.15s; }
+  .name-input-wrap input:focus { outline: none; border-color: var(--accent); }
+  .start-btn { width: 100%; font-family: var(--font); font-size: 15px; font-weight: 600; padding: 12px; border-radius: var(--radius); border: none; background: var(--amber); color: white; cursor: pointer; transition: opacity 0.15s; }
+  .start-btn:hover { opacity: 0.88; }
+
+  /* ── Patient grid ── */
+  .patient-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin-bottom: 1.75rem; }
+  .patient-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s; position: relative; }
+  .patient-card:hover { border-color: var(--border2); box-shadow: var(--shadow); transform: translateY(-1px); }
+  .patient-card.active { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(45,90,142,0.1); }
+  .patient-card.active::after { content: '✓'; position: absolute; top: 10px; right: 12px; font-size: 12px; color: var(--accent); font-weight: 600; }
+  .patient-card .name { font-weight: 600; font-size: 14px; }
+  .patient-card .details { font-size: 12px; color: var(--text2); margin-top: 3px; line-height: 1.45; }
+  .patient-card .tag { display: inline-block; margin-top: 8px; font-size: 11px; padding: 2px 8px; border-radius: 999px; font-family: var(--mono); }
+  .tag-new { background: var(--green-light); color: var(--green-text); }
+  .tag-drop { background: var(--amber-light); color: var(--amber-text); }
+  .tag-sports { background: var(--accent-light); color: var(--accent-text); }
+  .tag-multi { background: #f0e8f8; color: #4a1a7a; }
+
+  /* ── Exam type ── */
+  .exam-type-row { display: flex; gap: 8px; margin-bottom: 1.75rem; flex-wrap: wrap; }
+  .exam-type-btn { font-family: var(--font); font-size: 13px; font-weight: 500; padding: 7px 16px; border-radius: 999px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text2); cursor: pointer; transition: all 0.15s; }
+  .exam-type-btn:hover { border-color: var(--border2); color: var(--text); }
+  .exam-type-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+  /* ── Exam panel ── */
+  .exam-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 1rem; }
+  .exam-topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); background: var(--surface2); gap: 12px; flex-wrap: wrap; }
+  .patient-pill { display: flex; align-items: center; gap: 10px; }
+  .avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--accent-light); color: var(--accent-text); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; border: 1.5px solid #c0d4ec; }
+  .pname { font-weight: 600; font-size: 14px; }
+  .pdesc { font-size: 12px; color: var(--text2); }
+  .topbar-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .icon-btn { font-family: var(--font); font-size: 12px; padding: 5px 12px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); color: var(--text2); cursor: pointer; transition: all 0.15s; }
+  .icon-btn:hover { border-color: var(--border2); color: var(--text); }
+  .icon-btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+  .icon-btn.primary:hover { opacity: 0.88; }
+  .timer-display { font-family: var(--mono); font-size: 14px; color: var(--text2); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 5px 12px; }
+  .timer-display.warning { color: var(--red); border-color: #e8c0c0; background: var(--red-light); }
+
+  /* ── Chat ── */
+  .chat-body { padding: 1.25rem; min-height: 340px; max-height: 440px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; scroll-behavior: smooth; }
+  .msg { display: flex; gap: 10px; max-width: 82%; }
+  .msg.student { align-self: flex-end; flex-direction: row-reverse; }
+  .msg-av { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; margin-top: 2px; }
+  .patient .msg-av { background: var(--accent-light); color: var(--accent-text); border: 1px solid #c0d4ec; }
+  .student .msg-av { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  .bubble { padding: 10px 14px; border-radius: var(--radius-lg); font-size: 14px; line-height: 1.6; }
+  .patient .bubble { background: var(--surface2); border: 1px solid var(--border); border-radius: 3px var(--radius-lg) var(--radius-lg) var(--radius-lg); color: var(--text); }
+  .student .bubble { background: var(--accent); color: white; border-radius: var(--radius-lg) 3px var(--radius-lg) var(--radius-lg); }
+  .typing-row { display: flex; gap: 10px; align-items: center; }
+  .typing-bubble { background: var(--surface2); border: 1px solid var(--border); border-radius: 3px var(--radius-lg) var(--radius-lg) var(--radius-lg); padding: 12px 16px; display: flex; gap: 5px; align-items: center; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); animation: blink 1.3s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100%{opacity:.2} 40%{opacity:1} }
+
+  /* ── Quick prompts ── */
+  .quick-area { padding: 12px 16px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--bg); }
+  .quick-area p { font-size: 11px; color: var(--text3); margin-bottom: 8px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
+  .quick-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { font-family: var(--font); font-size: 12px; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--border2); background: var(--surface); color: var(--text2); cursor: pointer; transition: all 0.12s; }
+  .chip:hover { background: var(--accent-light); color: var(--accent-text); border-color: #c0d4ec; }
+
+  /* ── Input ── */
+  .input-area { display: flex; gap: 10px; padding: 14px 16px; align-items: flex-end; border-top: 1px solid var(--border); }
+  .input-area textarea { flex: 1; font-family: var(--font); font-size: 14px; padding: 10px 14px; border-radius: var(--radius); border: 1.5px solid var(--border); background: var(--bg); color: var(--text); resize: none; min-height: 42px; max-height: 120px; line-height: 1.5; transition: border-color 0.15s; }
+  .input-area textarea:focus { outline: none; border-color: var(--accent); }
+  .input-area textarea::placeholder { color: var(--text3); }
+  .input-area textarea:disabled { opacity: 0.5; cursor: not-allowed; }
+  .send-btn { font-family: var(--font); font-size: 14px; font-weight: 500; padding: 10px 20px; border-radius: var(--radius); border: none; background: var(--accent); color: white; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; height: 42px; }
+  .send-btn:hover { opacity: 0.88; }
+  .send-btn:disabled { opacity: 0.35; cursor: default; }
+  .api-error { background: var(--red-light); border: 1px solid #e8c0c0; border-radius: var(--radius); padding: 12px 16px; font-size: 13px; color: var(--red); margin: 0 1rem 1rem; display: none; }
+
+  /* ── Practice bottom bar ── */
+  .practice-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 0.75rem; }
+  .reset-btn { font-family: var(--font); font-size: 13px; font-weight: 500; padding: 7px 16px; border-radius: var(--radius); border: 1.5px solid var(--border2); background: transparent; color: var(--text2); cursor: pointer; transition: all 0.15s; }
+  .reset-btn:hover { background: var(--surface2); color: var(--text); }
+  .feedback-btn { font-family: var(--font); font-size: 13px; font-weight: 500; padding: 7px 16px; border-radius: var(--radius); border: none; background: var(--accent); color: white; cursor: pointer; transition: opacity 0.15s; }
+  .feedback-btn:hover { opacity: 0.88; }
+
+  /* ── Graded bottom bar ── */
+  .graded-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 0.75rem; }
+  .msg-count { font-size: 13px; color: var(--text3); font-family: var(--mono); }
+  .submit-btn { font-family: var(--font); font-size: 14px; font-weight: 500; padding: 10px 22px; border-radius: var(--radius); border: none; background: var(--green); color: white; cursor: pointer; transition: opacity 0.15s; }
+  .submit-btn:hover { opacity: 0.88; }
+  .submit-btn:disabled { opacity: 0.4; cursor: default; }
+
+  /* ── Feedback panel (practice) ── */
+  .feedback-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; margin-top: 1.25rem; display: none; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  .feedback-header { padding: 14px 18px; border-bottom: 1px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .feedback-header h2 { font-size: 15px; font-weight: 600; }
+  .close-btn { font-family: var(--font); font-size: 12px; padding: 5px 12px; border-radius: var(--radius); border: 1px solid var(--border); background: transparent; color: var(--text2); cursor: pointer; }
+  .close-btn:hover { background: var(--surface2); }
+  .feedback-body { padding: 1.25rem 1.5rem; }
+  .score-row { display: flex; gap: 10px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .score-card { flex: 1; min-width: 90px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; text-align: center; }
+  .score-num { font-size: 26px; font-weight: 600; font-family: var(--mono); color: var(--accent); line-height: 1; }
+  .score-label { font-size: 11px; color: var(--text3); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .checklist { list-style: none; margin-bottom: 1.25rem; }
+  .checklist li { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; color: var(--text2); }
+  .checklist li:last-child { border-bottom: none; }
+  .check-icon { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; margin-top: 1px; }
+  .check-done { background: var(--green-light); color: var(--green); }
+  .check-miss { background: var(--red-light); color: var(--red); }
+  .fb-section { margin-bottom: 1rem; }
+  .fb-section h3 { font-size: 13px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .fb-section p { font-size: 14px; color: var(--text); line-height: 1.65; }
+  .iterate-note { font-size: 13px; color: var(--accent-text); background: var(--accent-light); border: 1px solid #c0d4ec; border-radius: var(--radius); padding: 10px 14px; margin-top: 1rem; }
+
+  /* ── Transcript panel (graded) ── */
+  .transcript-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; margin-top: 1.25rem; display: none; animation: fadeIn 0.3s ease; }
+  .transcript-header { padding: 14px 18px; border-bottom: 1px solid var(--border); background: var(--green-light); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .transcript-header h2 { font-size: 15px; font-weight: 600; color: var(--green-text); }
+  .transcript-header p { font-size: 12px; color: var(--green); margin-top: 2px; }
+  .transcript-actions { display: flex; gap: 8px; }
+  .t-btn { font-family: var(--font); font-size: 12px; font-weight: 500; padding: 6px 14px; border-radius: var(--radius); border: 1px solid var(--green); background: transparent; color: var(--green-text); cursor: pointer; transition: all 0.15s; }
+  .t-btn:hover { background: var(--green-light); }
+  .t-btn.primary { background: var(--green); color: white; border-color: var(--green); }
+  .t-btn.primary:hover { opacity: 0.88; }
+  .transcript-body { padding: 1.25rem 1.5rem; }
+  .t-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1.25rem; }
+  .t-meta-item { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; }
+  .t-meta-item .label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+  .t-meta-item .value { font-size: 14px; color: var(--text); margin-top: 2px; font-weight: 500; }
+  .t-score-row { display: flex; gap: 10px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .t-log-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; }
+  .t-log { font-family: var(--mono); font-size: 12.5px; line-height: 1.7; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; max-height: 320px; overflow-y: auto; white-space: pre-wrap; color: var(--text2); }
+  .copy-note { font-size: 12px; color: var(--text3); margin-top: 10px; text-align: center; }
+
+  @media (max-width: 560px) {
+    .shell { padding: 1rem 1rem 3rem; }
+    .patient-grid { grid-template-columns: 1fr 1fr; }
+    .t-meta { grid-template-columns: 1fr; }
+    .t-score-row { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Mode switcher -->
+  <div class="mode-switcher">
+    <button class="mode-switch-btn active" id="switchPractice" onclick="switchMode('practice')">Practice</button>
+    <button class="mode-switch-btn graded" id="switchGraded" onclick="switchMode('graded')">Graded assignment</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       PRACTICE PANEL
+  ══════════════════════════════════════════════ -->
+  <div id="practicePanel" class="visible">
+
+    <div class="header">
+      <div class="header-left">
+        <h1>Contact Lens Fitting Simulator</h1>
+        <p>Practice your subjective history and initial fitting exam — unlimited attempts</p>
+      </div>
+      <span class="header-badge">PRACTICE MODE</span>
+    </div>
+
+    <div class="section-label">1 — Choose a patient</div>
+    <div class="patient-grid" id="practicePatientGrid"></div>
+
+    <div class="section-label">2 — Select exam type</div>
+    <div class="exam-type-row" id="examTypeRow">
+      <button class="exam-type-btn active" onclick="setExamType('fitting',this)">Initial fitting</button>
+      <button class="exam-type-btn" onclick="setExamType('followup',this)">Follow-up visit</button>
+      <button class="exam-type-btn" onclick="setExamType('problem',this)">Problem-solving</button>
+    </div>
+
+    <div class="section-label">3 — Conduct the interview</div>
+    <div class="exam-panel">
+      <div class="exam-topbar">
+        <div class="patient-pill">
+          <div class="avatar" id="pAvatar">SC</div>
+          <div>
+            <div class="pname" id="pName">Sarah Chen</div>
+            <div class="pdesc" id="pDesc">28 y/o · First-time wearer</div>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button class="icon-btn" onclick="resetPractice()">New session</button>
+          <button class="icon-btn primary" onclick="requestFeedback()">Review my interview</button>
+        </div>
+      </div>
+
+      <div class="chat-body" id="practiceChatBody"></div>
+      <div class="api-error" id="practiceApiError">Unable to reach the AI. Check your connection and try again.</div>
+
+      <div class="quick-area">
+        <p>Quick prompts</p>
+        <div class="quick-chips" id="quickChips"></div>
+      </div>
+
+      <div class="input-area">
+        <textarea id="practiceInput" placeholder="Type your question or exam finding…" rows="1"
+          onkeydown="handlePracticeKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="practiceSendBtn" onclick="sendPractice()">Send</button>
+      </div>
+    </div>
+
+    <div class="practice-bar">
+      <button class="reset-btn" onclick="resetPractice()">Start over</button>
+      <button class="feedback-btn" onclick="requestFeedback()">Review my interview →</button>
+    </div>
+
+    <!-- Feedback panel (repeatable) -->
+    <div class="feedback-panel" id="practiceFeedbackPanel">
+      <div class="feedback-header">
+        <h2>Interview review</h2>
+        <button class="close-btn" onclick="closeFeedback()">Close</button>
+      </div>
+      <div class="feedback-body" id="practiceFeedbackBody"></div>
+    </div>
+
+  </div><!-- /practicePanel -->
+
+
+  <!-- ══════════════════════════════════════════════
+       GRADED ASSIGNMENT PANEL
+  ══════════════════════════════════════════════ -->
+  <div id="gradedPanel">
+
+    <!-- Start screen -->
+    <div id="gradedStartScreen">
+      <div class="start-screen">
+        <h2>Graded assignment</h2>
+        <p>You will be given a new patient and 20 minutes to conduct a complete interview. At the end you will receive feedback and a submission record to upload to Canvas.</p>
+        <ul class="start-rules">
+          <li><span class="rule-icon">⏱</span>20-minute time limit — the interview locks when time runs out</li>
+          <li><span class="rule-icon">🚫</span>No prompt suggestions — questions are up to you</li>
+          <li><span class="rule-icon">📋</span>Feedback and submission record generated at the end</li>
+          <li><span class="rule-icon">📸</span>Screenshot or copy your record to submit in Canvas</li>
+        </ul>
+        <div class="name-input-wrap">
+          <label for="studentName">Your name (for submission record)</label>
+          <input type="text" id="studentName" placeholder="First Last" />
+        </div>
+        <button class="start-btn" onclick="startGraded()">Begin exam →</button>
+      </div>
+    </div>
+
+    <!-- Active exam (hidden until started) -->
+    <div id="gradedExamScreen" style="display:none;">
+
+      <div class="header">
+        <div class="header-left">
+          <h1>Contact Lens Fitting — Graded Assignment</h1>
+          <p id="gradedStudentLabel">Student: —</p>
+        </div>
+        <span class="header-badge graded">GRADED</span>
+      </div>
+
+      <div class="exam-panel">
+        <div class="exam-topbar">
+          <div class="patient-pill">
+            <div class="avatar" style="background:#f0e8f8;color:#4a1a7a;border-color:#c8b0e0;">DK</div>
+            <div>
+              <div class="pname">Derek Kim</div>
+              <div class="pdesc">31 y/o · New patient</div>
+            </div>
+          </div>
+          <div class="timer-display" id="gradedTimer">20:00</div>
+        </div>
+
+        <div class="chat-body" id="gradedChatBody"></div>
+        <div class="api-error" id="gradedApiError">Unable to reach the AI. Check your connection and try again.</div>
+
+        <div class="input-area">
+          <textarea id="gradedInput" placeholder="Type your question…" rows="1"
+            onkeydown="handleGradedKey(event)" oninput="autoResize(this)"></textarea>
+          <button class="send-btn" id="gradedSendBtn" onclick="sendGraded()">Send</button>
+        </div>
+      </div>
+
+      <div class="graded-bar">
+        <span class="msg-count" id="gradedMsgCount">0 exchanges</span>
+        <button class="submit-btn" id="gradedSubmitBtn" onclick="submitGraded()">Submit &amp; get feedback</button>
+      </div>
+
+      <!-- Transcript + feedback (end of graded) -->
+      <div class="transcript-panel" id="gradedTranscriptPanel">
+        <div class="transcript-header">
+          <div>
+            <h2>Submission record</h2>
+            <p>Copy or screenshot this record to submit to your instructor.</p>
+          </div>
+          <div class="transcript-actions">
+            <button class="t-btn" onclick="copyGradedTranscript()">Copy text</button>
+            <button class="t-btn primary" onclick="window.print()">Print / save PDF</button>
+          </div>
+        </div>
+        <div class="transcript-body" id="gradedTranscriptBody"></div>
+      </div>
+
+    </div><!-- /gradedExamScreen -->
+
+  </div><!-- /gradedPanel -->
+
+</div><!-- /shell -->
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+
+const PRACTICE_PATIENTS = [
+  {
+    name: 'Sarah Chen', initials: 'SC', age: 28,
+    desc: '28 y/o · First-time wearer',
+    details: 'Myope, interested in outdoor/sports wear',
+    tag: 'First-time wearer', tagClass: 'tag-new',
+    profile: `You are Sarah Chen, a 28-year-old graphic designer seeking contact lenses for the first time. Glasses Rx: -3.50 -0.75 x 180 OD, -4.00 -0.75 x 175 OS. You spend 10+ hours/day on screens; eyes feel dry and tired by late evening. No significant medical or ocular history. Wore glasses since age 12. You want contacts for convenience and weekend hiking. No known allergies. Answer as a real patient — conversational, slightly nervous, don't volunteer all information at once. 1–3 sentences per response.`
+  },
+  {
+    name: 'Marcus Webb', initials: 'MW', age: 42,
+    desc: '42 y/o · Presbyope',
+    details: 'Dry eye hx, wants multifocal options',
+    tag: 'Multifocal candidate', tagClass: 'tag-multi',
+    profile: `You are Marcus Webb, a 42-year-old accountant who wore monthly soft lenses for years but now struggles with near vision and midday dryness. Distance Rx: -2.00 OU, Add: +1.75. Mild dry eye; use Systane Ultra occasionally. Had a red eye from extended wear once — cautious about overnight use. Take lisinopril and loratadine. Interested in multifocal options. Don't over-share; wait for questions. 1–3 sentences per response.`
+  },
+  {
+    name: 'Jordan Lee', initials: 'JL', age: 19,
+    desc: '19 y/o · Collegiate athlete',
+    details: 'High astigmatism, budget-conscious',
+    tag: 'Toric / sports wear', tagClass: 'tag-sports',
+    profile: `You are Jordan Lee, a 19-year-old college student and competitive soccer player. Rx: -2.50 -1.75 x 180 OD, -3.00 -2.00 x 175 OS. Tried soft lenses before — felt blurry and kept rotating. Want contacts for sports. Healthy, no medications. Budget is a concern; you'll bring it up if nobody asks. Prefer dailies. Be slightly impatient. 1–3 sentences per response.`
+  },
+  {
+    name: 'Linda Osei', initials: 'LO', age: 35,
+    desc: '35 y/o · Previous dropout',
+    details: 'Dryness / discomfort, wants to retry',
+    tag: 'Lens dropout', tagClass: 'tag-drop',
+    profile: `You are Linda Osei, a 35-year-old RN who stopped wearing contact lenses 2 years ago due to dryness and irritation during 12-hour hospital shifts. Wore biweekly soft lenses for 8 years. Told your tear film was "borderline." Rx: -1.75 -0.50 x 90 OD, -2.25 -0.75 x 85 OS. A colleague told you about newer daily SiHy lenses; willing to try again but skeptical. No systemic conditions. Be guarded — you've been disappointed before. 1–3 sentences per response.`
+  }
+];
+
+// Graded patient — not shown in practice
+const GRADED_PATIENT = {
+  name: 'Derek Kim', initials: 'DK', age: 31,
+  desc: '31 y/o · New patient',
+  profile: `You are Derek Kim, a 31-year-old IT project manager at a mid-size company. You are visiting an eye clinic hoping to start wearing contact lenses. Here is your full background — only reveal details when the student asks appropriate questions.
+
+PERSONAL HISTORY: Full name Derek James Kim. Date of birth: August 22, 1993. Occupation: IT project manager. Works long hours at a desk, often 9–10 hours/day. If asked for phone or address, say you'll give it to the front desk.
+
+REASON FOR SEEKING CONTACT LENSES: You wore soft daily contact lenses for about 3 years in your mid-20s (ages 25–28) but stopped because you kept forgetting to reorder them and found the routine inconvenient. You recently started recreational volleyball and your glasses keep slipping during games. A teammate wears monthlies and recommended you try again.
+
+MEDICAL HISTORY: You have seasonal rhinitis (dust and grass) managed with fluticasone nasal spray. No eye drops currently. You take no other medications. You had LASIK consultations twice but were told you were not a good candidate due to thin corneas — this makes you slightly anxious about anything touching your eyes. No other systemic conditions. No known drug allergies. No surgeries.
+
+VISUAL / OCULAR HISTORY: Glasses Rx approximately -4.25 -0.50 x 170 OD and -3.75 sphere OS. No history of eye disease or trauma. Last eye exam approximately 18 months ago.
+
+PRIOR CONTACT LENS HISTORY: You wore Acuvue Moist 1-Day lenses for about 3 years. No solution required (dailies). Typical wear time was about 10–12 hours. You stopped due to the inconvenience of reordering — not because of discomfort. You occasionally had mild end-of-day dryness but nothing severe. You never slept in them.
+
+PERSONALITY: Calm and professional. You answer questions clearly when asked but are not forthcoming with medical details unless specifically asked. You are nervous about anything related to corneal health due to the LASIK consultations — you might mention "I was told my corneas were thin" if the student asks about ocular history in a way that invites it. You won't volunteer the LASIK history unless directly asked about prior consultations or corneal issues.
+
+Keep all responses to 1–3 sentences, natural and professional. Do not break character.`
+};
+
+const MODE_CONTEXTS = {
+  fitting: 'This is an INITIAL contact lens fitting consultation. The student should gather: chief complaint, personal history, ocular and medical history, medication and allergy review, lifestyle and wear schedule, prior contact lens experience including type, wear time, and solutions used.',
+  followup: 'This is a FOLLOW-UP visit after a one-week contact lens trial. Ask about comfort, vision quality, wear time achieved, insertion/removal, redness, dryness, compliance with care system.',
+  problem: 'The patient is presenting with a PROBLEM. The student must take a problem-focused history. The patient has a specific complaint that will emerge through questioning.'
+};
+
+const COMPETENCY_ITEMS = {
+  fitting: [
+    '2a — Recorded personal history (name, date of birth, occupation, etc.)',
+    '2b — Investigated reasons for seeking contact lenses',
+    '2c — Recorded medical health history (diabetes, allergies, arthritis, pregnancy, etc.)',
+    '2c — Recorded visual health history',
+    '2d — Recorded prior contact lens type and brand',
+    '2d — Recorded prior wear time',
+    '2d — Recorded prior lens care solutions used'
+  ],
+  followup: [
+    '2a — Confirmed/updated personal history',
+    '2b — Explored motivation or goals with contact lens wear',
+    '2c — Reviewed changes to medical or ocular health',
+    '2d — Reviewed trial lens type and wear schedule',
+    'Asked about comfort throughout the day',
+    'Assessed vision quality with trial lenses',
+    'Inquired about redness, dryness, or adverse events'
+  ],
+  problem: [
+    '2a — Confirmed patient identity and personal history',
+    '2b — Clarified presenting complaint and reason for visit',
+    '2c — Reviewed relevant medical and ocular history',
+    '2d — Reviewed current lens type, wear time, and solutions',
+    'Asked about onset and duration of symptoms',
+    'Assessed laterality (one eye vs both)',
+    'Screened for red flags (pain, photophobia, discharge)'
+  ]
+};
+
+const QUICK_PROMPTS = {
+  fitting: [
+    "What brings you in today?",
+    "Have you worn contact lenses before?",
+    "Tell me about your glasses prescription.",
+    "Do you have any eye conditions or surgeries?",
+    "Any medical conditions or medications?",
+    "Do you have any allergies?",
+    "How many hours a day are you hoping to wear lenses?",
+    "What activities would contacts help with?"
+  ],
+  followup: [
+    "How have the trial lenses been overall?",
+    "How many hours a day were you able to wear them?",
+    "Any dryness or discomfort at any point?",
+    "How was your vision — any blur or fluctuation?",
+    "Any redness or irritation?",
+    "How are you finding insertion and removal?"
+  ],
+  problem: [
+    "Tell me what's been going on.",
+    "When did this start?",
+    "Is it one eye or both?",
+    "Does it happen at a certain time of day?",
+    "Have you changed your lens brand or solution recently?",
+    "Are you sleeping in your lenses at all?"
+  ]
+};
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+
+let appMode = 'practice'; // 'practice' | 'graded'
+
+// Practice state
+let practicePatient = 0;
+let practiceExamType = 'fitting';
+let practiceHistory = [];
+
+// Graded state
+let gradedHistory = [];
+let gradedExchanges = 0;
+let gradedElapsed = 0;
+let gradedTimer = null;
+let gradedSubmitted = false;
+let gradedStartTime = null;
+let studentName = '';
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+
+function init() {
+  renderPatientGrid();
+  renderQuickChips();
+  resetPractice();
+}
+
+function switchMode(mode) {
+  appMode = mode;
+  document.getElementById('practicePanel').classList.toggle('visible', mode === 'practice');
+  document.getElementById('gradedPanel').classList.toggle('visible', mode === 'graded');
+  document.getElementById('switchPractice').classList.toggle('active', mode === 'practice');
+  document.getElementById('switchGraded').classList.toggle('active', mode === 'graded');
+}
+
+// ═══════════════════════════════════════════════
+// PRACTICE — setup
+// ═══════════════════════════════════════════════
+
+function renderPatientGrid() {
+  const g = document.getElementById('practicePatientGrid');
+  g.innerHTML = PRACTICE_PATIENTS.map((p,i) => `
+    <div class="patient-card ${i===0?'active':''}" id="pc_${i}" onclick="selectPatient(${i})">
+      <div class="name">${p.name}</div>
+      <div class="details">${p.details}</div>
+      <span class="tag ${p.tagClass}">${p.tag}</span>
+    </div>`).join('');
+}
+
+function selectPatient(idx) {
+  practicePatient = idx;
+  document.querySelectorAll('.patient-card').forEach((c,i) => c.classList.toggle('active', i===idx));
+  const p = PRACTICE_PATIENTS[idx];
+  document.getElementById('pAvatar').textContent = p.initials;
+  document.getElementById('pName').textContent = p.name;
+  document.getElementById('pDesc').textContent = p.desc;
+  resetPractice();
+}
+
+function setExamType(type, btn) {
+  practiceExamType = type;
+  document.querySelectorAll('.exam-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderQuickChips();
+  resetPractice();
+}
+
+function renderQuickChips() {
+  const c = document.getElementById('quickChips');
+  c.innerHTML = QUICK_PROMPTS[practiceExamType].map(q =>
+    `<button class="chip" onclick="quickSend('${q.replace(/'/g,"\\'")}')">${q}</button>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════
+// PRACTICE — chat
+// ═══════════════════════════════════════════════
+
+function resetPractice() {
+  practiceHistory = [];
+  document.getElementById('practiceFeedbackPanel').style.display = 'none';
+  document.getElementById('practiceApiError').style.display = 'none';
+  document.getElementById('practiceInput').value = '';
+
+  const p = PRACTICE_PATIENTS[practicePatient];
+  const greetings = {
+    fitting: "Hi! I have an appointment — I'm interested in trying contact lenses.",
+    followup: "Hi, I'm back for my follow-up. I've been wearing those trial lenses you gave me.",
+    problem: "Hi, I need to be seen — I've been having some trouble with my contact lenses."
+  };
+  const opening = greetings[practiceExamType];
+  const cb = document.getElementById('practiceChatBody');
+  cb.innerHTML = '';
+  practiceAddMsg('patient', opening, p.initials);
+  practiceHistory.push({ role: 'assistant', content: opening });
+}
+
+function practiceAddMsg(role, text, initials) {
+  const cb = document.getElementById('practiceChatBody');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const av = role === 'patient' ? (initials || PRACTICE_PATIENTS[practicePatient].initials) : 'Me';
+  div.innerHTML = `<div class="msg-av">${av}</div><div class="bubble">${escHtml(text)}</div>`;
+  cb.appendChild(div);
+  cb.scrollTop = cb.scrollHeight;
+}
+
+function practiceShowTyping() {
+  const cb = document.getElementById('practiceChatBody');
+  const t = document.createElement('div');
+  t.id = 'practiceTyping';
+  t.className = 'typing-row';
+  const av = PRACTICE_PATIENTS[practicePatient].initials;
+  t.innerHTML = `<div class="msg-av" style="background:var(--accent-light);color:var(--accent-text);border:1px solid #c0d4ec;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">${av}</div><div class="typing-bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  cb.appendChild(t);
+  cb.scrollTop = cb.scrollHeight;
+}
+
+async function sendPractice() {
+  const inp = document.getElementById('practiceInput');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = ''; autoResize(inp);
+
+  const btn = document.getElementById('practiceSendBtn');
+  btn.disabled = true;
+  document.getElementById('practiceApiError').style.display = 'none';
+  practiceAddMsg('student', text);
+  practiceHistory.push({ role: 'user', content: text });
+  practiceShowTyping();
+
+  try {
+    const p = PRACTICE_PATIENTS[practicePatient];
+    const sys = `${p.profile}\n\nClinical context: ${MODE_CONTEXTS[practiceExamType]}\n\nStay strictly in character. Do not break character or offer clinical commentary. 1–3 sentences max.`;
+    const reply = await callClaude(sys, practiceHistory);
+    document.getElementById('practiceTyping')?.remove();
+    practiceAddMsg('patient', reply);
+    practiceHistory.push({ role: 'assistant', content: reply });
+  } catch(e) {
+    document.getElementById('practiceTyping')?.remove();
+    document.getElementById('practiceApiError').style.display = 'block';
+  }
+  btn.disabled = false;
+  inp.focus();
+}
+
+function quickSend(text) {
+  document.getElementById('practiceInput').value = text.trim();
+  sendPractice();
+}
+
+function handlePracticeKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendPractice(); }
+}
+
+// ═══════════════════════════════════════════════
+// PRACTICE — feedback (repeatable)
+// ═══════════════════════════════════════════════
+
+async function requestFeedback() {
+  if (practiceHistory.filter(m => m.role === 'user').length < 3) {
+    alert('Ask a few more questions before requesting feedback.');
+    return;
+  }
+  const panel = document.getElementById('practiceFeedbackPanel');
+  const body = document.getElementById('practiceFeedbackBody');
+  panel.style.display = 'block';
+  body.innerHTML = '<div style="padding:1rem;color:var(--text3);font-size:14px;">Analyzing your interview…</div>';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  try {
+    const { score, covered, missed, praise, improvement, tip } = await analyzeFeedback(practiceHistory, practiceExamType);
+    renderFeedback(body, score, covered, missed, praise, improvement, tip, true);
+  } catch(e) {
+    body.innerHTML = '<div style="padding:1rem;color:var(--red);font-size:14px;">Could not generate feedback. Please try again.</div>';
+  }
+}
+
+function closeFeedback() {
+  document.getElementById('practiceFeedbackPanel').style.display = 'none';
+}
+
+function renderFeedback(container, score, covered, missed, praise, improvement, tip, showIterateNote) {
+  const total = covered.length + missed.length;
+  const pct = total > 0 ? Math.round((covered.length / total) * 100) : 0;
+  const checklistHtml = [
+    ...covered.map(i => `<li><span class="check-icon check-done">✓</span><span>${escHtml(i)}</span></li>`),
+    ...missed.map(i => `<li><span class="check-icon check-miss">✗</span><span>${escHtml(i)}</span></li>`)
+  ].join('');
+
+  container.innerHTML = `
+    <div class="score-row">
+      <div class="score-card"><div class="score-num">${score}</div><div class="score-label">Score</div></div>
+      <div class="score-card"><div class="score-num">${covered.length}/${total}</div><div class="score-label">Items covered</div></div>
+      <div class="score-card"><div class="score-num">${pct}%</div><div class="score-label">Competency</div></div>
+    </div>
+    <div class="section-label" style="margin-bottom:8px;">Competency checklist (2a–2d)</div>
+    <ul class="checklist">${checklistHtml}</ul>
+    <div class="fb-section"><h3>What you did well</h3><p>${escHtml(praise)}</p></div>
+    <div class="fb-section"><h3>Areas to improve</h3><p>${escHtml(improvement)}</p></div>
+    <div class="fb-section"><h3>Tip for next time</h3><p>${escHtml(tip)}</p></div>
+    ${showIterateNote ? '<div class="iterate-note">You can keep practicing and request feedback again at any time to see your score improve.</div>' : ''}
+  `;
+}
+
+// ═══════════════════════════════════════════════
+// GRADED — start
+// ═══════════════════════════════════════════════
+
+function startGraded() {
+  const nameVal = document.getElementById('studentName').value.trim();
+  if (!nameVal) { alert('Please enter your name before starting.'); return; }
+  studentName = nameVal;
+
+  document.getElementById('gradedStartScreen').style.display = 'none';
+  document.getElementById('gradedExamScreen').style.display = 'block';
+  document.getElementById('gradedStudentLabel').textContent = `Student: ${studentName}`;
+
+  gradedHistory = [];
+  gradedExchanges = 0;
+  gradedElapsed = 0;
+  gradedSubmitted = false;
+  gradedStartTime = new Date();
+  document.getElementById('gradedMsgCount').textContent = '0 exchanges';
+  document.getElementById('gradedTranscriptPanel').style.display = 'none';
+  document.getElementById('gradedApiError').style.display = 'none';
+
+  const cb = document.getElementById('gradedChatBody');
+  cb.innerHTML = '';
+  const opening = "Hi, I have an appointment — I'm hoping to talk about getting contact lenses.";
+  gradedAddMsg('patient', opening);
+  gradedHistory.push({ role: 'assistant', content: opening });
+
+  startGradedTimer();
+}
+
+// ═══════════════════════════════════════════════
+// GRADED — timer
+// ═══════════════════════════════════════════════
+
+function startGradedTimer() {
+  const TOTAL = 20 * 60;
+  gradedTimer = setInterval(() => {
+    gradedElapsed++;
+    const remaining = TOTAL - gradedElapsed;
+    const el = document.getElementById('gradedTimer');
+    if (remaining <= 0) {
+      el.textContent = '00:00';
+      el.classList.add('warning');
+      clearInterval(gradedTimer);
+      lockGraded('Time is up. Please submit your transcript.');
+      return;
+    }
+    const m = Math.floor(remaining/60).toString().padStart(2,'0');
+    const s = (remaining%60).toString().padStart(2,'0');
+    el.textContent = `${m}:${s}`;
+    if (remaining <= 120) el.classList.add('warning');
+  }, 1000);
+}
+
+function lockGraded(msg) {
+  document.getElementById('gradedInput').disabled = true;
+  document.getElementById('gradedSendBtn').disabled = true;
+  if (msg) {
+    const cb = document.getElementById('gradedChatBody');
+    const note = document.createElement('div');
+    note.style.cssText = 'text-align:center;font-size:13px;color:var(--text3);padding:8px 0;';
+    note.textContent = msg;
+    cb.appendChild(note);
+    cb.scrollTop = cb.scrollHeight;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// GRADED — chat
+// ═══════════════════════════════════════════════
+
+function gradedAddMsg(role, text) {
+  const cb = document.getElementById('gradedChatBody');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const av = role === 'patient' ? GRADED_PATIENT.initials : 'Me';
+  div.innerHTML = `<div class="msg-av" style="${role==='patient'?'background:#f0e8f8;color:#4a1a7a;border:1px solid #c8b0e0;':'background:var(--surface2);color:var(--text2);border:1px solid var(--border);'} width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;margin-top:2px;">${av}</div><div class="bubble">${escHtml(text)}</div>`;
+  cb.appendChild(div);
+  cb.scrollTop = cb.scrollHeight;
+}
+
+function gradedShowTyping() {
+  const cb = document.getElementById('gradedChatBody');
+  const t = document.createElement('div');
+  t.id = 'gradedTyping';
+  t.className = 'typing-row';
+  t.innerHTML = `<div class="msg-av" style="background:#f0e8f8;color:#4a1a7a;border:1px solid #c8b0e0;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">${GRADED_PATIENT.initials}</div><div class="typing-bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  cb.appendChild(t);
+  cb.scrollTop = cb.scrollHeight;
+}
+
+async function sendGraded() {
+  if (gradedSubmitted) return;
+  const inp = document.getElementById('gradedInput');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = ''; autoResize(inp);
+
+  const btn = document.getElementById('gradedSendBtn');
+  btn.disabled = true;
+  document.getElementById('gradedApiError').style.display = 'none';
+  gradedAddMsg('student', text);
+  gradedHistory.push({ role: 'user', content: text });
+  gradedShowTyping();
+
+  try {
+    const sys = `${GRADED_PATIENT.profile}\n\nClinical context: ${MODE_CONTEXTS['fitting']}\n\nStay strictly in character. Do not break character or offer clinical commentary. 1–3 sentences max.`;
+    const reply = await callClaude(sys, gradedHistory);
+    document.getElementById('gradedTyping')?.remove();
+    gradedAddMsg('patient', reply);
+    gradedHistory.push({ role: 'assistant', content: reply });
+    gradedExchanges++;
+    document.getElementById('gradedMsgCount').textContent = `${gradedExchanges} exchange${gradedExchanges!==1?'s':''}`;
+  } catch(e) {
+    document.getElementById('gradedTyping')?.remove();
+    document.getElementById('gradedApiError').style.display = 'block';
+  }
+  btn.disabled = false;
+  inp.focus();
+}
+
+function handleGradedKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendGraded(); }
+}
+
+// ═══════════════════════════════════════════════
+// GRADED — submit
+// ═══════════════════════════════════════════════
+
+async function submitGraded() {
+  if (gradedSubmitted) return;
+  if (gradedExchanges < 3) { alert('Please conduct your interview before submitting.'); return; }
+
+  gradedSubmitted = true;
+  clearInterval(gradedTimer);
+  lockGraded('Interview submitted.');
+  document.getElementById('gradedSubmitBtn').disabled = true;
+
+  const panel = document.getElementById('gradedTranscriptPanel');
+  const body = document.getElementById('gradedTranscriptBody');
+  panel.style.display = 'block';
+  body.innerHTML = '<div style="padding:1.5rem;color:var(--text3);font-size:14px;">Generating your feedback and submission record…</div>';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  const endTime = new Date();
+  const mins = Math.floor(gradedElapsed/60);
+  const secs = gradedElapsed%60;
+  const dateStr = endTime.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+  const timeStr = endTime.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+
+  try {
+    const { score, covered, missed, praise, improvement, tip } = await analyzeFeedback(gradedHistory, 'fitting');
+
+    const total = covered.length + missed.length;
+    const pct = total > 0 ? Math.round((covered.length / total) * 100) : 0;
+    const checklistHtml = [
+      ...covered.map(i => `<li><span class="check-icon check-done">✓</span><span>${escHtml(i)}</span></li>`),
+      ...missed.map(i => `<li><span class="check-icon check-miss">✗</span><span>${escHtml(i)}</span></li>`)
+    ].join('');
+
+    const transcript = gradedHistory.map(m =>
+      `[${m.role==='user'?'STUDENT':'PATIENT'}]  ${m.content}`
+    ).join('\n\n');
+
+    body.innerHTML = `
+      <div class="t-meta">
+        <div class="t-meta-item"><div class="label">Student</div><div class="value">${escHtml(studentName)}</div></div>
+        <div class="t-meta-item"><div class="label">Date</div><div class="value">${dateStr} at ${timeStr}</div></div>
+        <div class="t-meta-item"><div class="label">Duration</div><div class="value">${mins}m ${secs}s</div></div>
+        <div class="t-meta-item"><div class="label">Exchanges</div><div class="value">${gradedExchanges}</div></div>
+      </div>
+
+      <div class="t-score-row">
+        <div class="score-card"><div class="score-num">${score}</div><div class="score-label">Score</div></div>
+        <div class="score-card"><div class="score-num">${covered.length}/${total}</div><div class="score-label">Items covered</div></div>
+        <div class="score-card"><div class="score-num">${pct}%</div><div class="score-label">Competency</div></div>
+      </div>
+
+      <div class="section-label" style="margin-bottom:8px;">Competency checklist (2a–2d)</div>
+      <ul class="checklist" style="margin-bottom:1.25rem;">${checklistHtml}</ul>
+
+      <div class="fb-section"><h3>What you did well</h3><p>${escHtml(praise)}</p></div>
+      <div class="fb-section"><h3>Areas to improve</h3><p>${escHtml(improvement)}</p></div>
+      <div class="fb-section"><h3>Tip for next time</h3><p>${escHtml(tip)}</p></div>
+
+      <div class="t-log-label" style="margin-top:1.5rem;">Interview transcript</div>
+      <div class="t-log" id="gradedLogEl">${escHtml(transcript)}</div>
+      <p class="copy-note">Screenshot this page or use "Copy text" to paste into your Canvas submission.</p>
+    `;
+
+    // Store for copy
+    window._gradedTranscriptText = `Contact Lens Fitting — Graded Assignment\nStudent: ${studentName}\nPatient: ${GRADED_PATIENT.name}\nDate: ${dateStr} at ${timeStr}\nDuration: ${mins}m ${secs}s\nExchanges: ${gradedExchanges}\nScore: ${score}/100\n\nCOMPETENCY CHECKLIST\n${covered.map(i=>'✓ '+i).join('\n')}\n${missed.map(i=>'✗ '+i).join('\n')}\n\nFEEDBACK\n${praise}\n${improvement}\n${tip}\n\nTRANSCRIPT\n${transcript}`;
+
+  } catch(e) {
+    body.innerHTML = '<div style="padding:1.5rem;color:var(--red);font-size:14px;">Could not generate feedback. Your session is saved — please try resubmitting or contact your instructor.</div>';
+  }
+}
+
+function copyGradedTranscript() {
+  if (!window._gradedTranscriptText) return;
+  navigator.clipboard.writeText(window._gradedTranscriptText).then(() => {
+    const btn = event.target;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy text', 2000);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// SHARED — API + feedback analysis
+// ═══════════════════════════════════════════════
+
+async function callClaude(systemPrompt, messages) {
+  const resp = await fetch('/.netlify/functions/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-3-haiku-20240307',
+      max_tokens: 1000,
+      system: systemPrompt,
+      messages
+    })
+  });
+  if (!resp.ok) throw new Error('API error');
+  const data = await resp.json();
+  return data.content?.map(c => c.text||'').join('') || "Sorry, could you repeat that?";
+}
+
+async function analyzeFeedback(history, examType) {
+  const items = COMPETENCY_ITEMS[examType];
+  const transcript = history.map(m => `${m.role==='user'?'Student':'Patient'}: ${m.content}`).join('\n');
+
+  const prompt = `You are an optometry clinical instructor evaluating a student's simulated patient interview for an initial contact lens fitting.
+
+Competency items to assess (these are the official rubric items): ${JSON.stringify(items)}
+
+Transcript:
+${transcript}
+
+Respond ONLY with valid JSON, no markdown or extra text:
+{
+  "score": <integer 0-100>,
+  "covered": [<competency items adequately addressed>],
+  "missed": [<competency items not addressed or insufficient>],
+  "praise": "<1-2 sentences on what the student did well>",
+  "improvement": "<1-2 sentences on the most important gaps>",
+  "tip": "<one specific actionable technique tip>"
+}`;
+
+  const resp = await fetch('/.netlify/functions/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-3-haiku-20240307',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  if (!resp.ok) throw new Error('API error');
+  const data = await resp.json();
+  const raw = data.content?.map(c=>c.text||'').join('')||'{}';
+  const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+  return {
+    score: parsed.score ?? 0,
+    covered: parsed.covered || [],
+    missed: parsed.missed || [],
+    praise: parsed.praise || '',
+    improvement: parsed.improvement || '',
+    tip: parsed.tip || ''
+  };
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+init();
+</script>
+</body>
+</html>
