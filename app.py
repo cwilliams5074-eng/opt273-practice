@@ -1,10 +1,15 @@
+bash
+
+cat /home/claude/app_final.py
+Output
+
 import streamlit as st
 import anthropic
 import os
 import json
 from datetime import datetime
 
-st.set_page_config(page_title="OPT 273 Contact Lens Simulator", layout="centered")
+st.set_page_config(page_title="Subjective Interview Simulator", layout="centered")
 
 PATIENTS = {
     "Sarah Chen — 28 y/o, first-time wearer": {
@@ -107,7 +112,7 @@ def build_download_text(student_name, patient_name, mode, messages, fb, now, exc
     pct = round(len(fb["covered"]) / total * 100) if total > 0 else 0
     covered_lines = "\n".join(["COVERED: " + i for i in fb["covered"]])
     missed_lines = "\n".join(["MISSED: " + i for i in fb["missed"]])
-    return f"""OPT 273 — Contact Lens Fitting Simulator
+    return f"""Subjective Interview Simulator
 {mode}
 {"Student: " + student_name if student_name else ""}
 Patient: {patient_name}
@@ -139,7 +144,7 @@ def send_message(msg, session_key, system_prompt):
     st.rerun()
 
 # ── UI ──
-st.title("OPT 273 — Contact Lens Fitting Simulator")
+st.title("Subjective Interview Simulator")
 mode = st.radio("Select mode", ["Practice", "Graded Assignment"], horizontal=True)
 
 # ══════════════════════════════════════════════
