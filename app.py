@@ -46,7 +46,7 @@ def get_client():
 def get_ai_response(system_prompt, messages):
     client = get_client()
     response = client.messages.create(
-        model="claude-3-haiku-20240307",
+        model="claude-haiku-4-5-20251001",
         max_tokens=300,
         system=system_prompt,
         messages=messages
@@ -73,7 +73,7 @@ Respond ONLY with valid JSON, no markdown:
   "tip": "<one specific tip>"
 }}"""
     response = client.messages.create(
-        model="claude-3-haiku-20240307",
+        model="claude-haiku-4-5-20251001",
         max_tokens=1000,
         messages=[{"role": "user", "content": prompt}]
     )
