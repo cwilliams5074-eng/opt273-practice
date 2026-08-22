@@ -47,14 +47,10 @@ COMPETENCY_ITEMS = [
 QUICK_PROMPTS = [
     "What brings you in today?",
     "Have you worn contact lenses before?",
-    "Tell me about your glasses prescription.",
-    "Do you have any eye conditions or surgeries?",
-    "Any medical conditions or medications?",
-    "Do you have any allergies?",
-    "How many hours a day are you hoping to wear lenses?",
-    "What activities would contacts help with?",
+    "Do you have any medical conditions or allergies?",
+    "Are you currently taking any medications?",
+    "Can you tell me about your eye health history?",
     "What is your date of birth?",
-    "What do you do for work?",
 ]
 
 def get_client():
@@ -125,7 +121,7 @@ if "selected_patient" not in st.session_state:
 
 # ── UI ──
 st.title("Subjective Interview Simulator")
-st.markdown("Approach this simulation as you would a real patient interview. Respond to what the patient tells you and use follow-up questions when appropriate. There is no required script or checklist — focus on having a natural clinical conversation.")
+st.markdown("Approach this simulation as you would a real patient interview. Respond to what the patient tells you and use follow-up questions when appropriate. Practice using open-ended questions to encourage the patient to share information in their own words. There is no required script or checklist — focus on having a natural clinical conversation.")
 st.markdown("---")
 
 # ── Patient selector ──
