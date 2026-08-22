@@ -133,6 +133,7 @@ if patient_name != st.session_state.selected_patient:
     st.rerun()
 
 st.markdown("---")
+st.markdown("**Patient interview**")
 
 # ── Chat ──
 for msg in st.session_state.messages:
