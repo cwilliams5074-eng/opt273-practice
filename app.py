@@ -10,31 +10,39 @@ PATIENTS = {
     "Sarah Chen — 28 y/o, first-time wearer": {
         "initials": "SC",
         "greeting": "Hi! I have an appointment — I'm interested in trying contact lenses for the first time.",
-        "profile": """You are Sarah Chen, a 28-year-old graphic designer seeking contact lenses for the first time. Glasses Rx: -3.50 -0.75 x 180 OD, -4.00 -0.75 x 175 OS. You spend 10+ hours/day on screens; eyes feel dry and tired by late evening. No significant medical or ocular history. Wore glasses since age 12. You want contacts for convenience and weekend hiking. No known allergies. Answer as a real patient — conversational, slightly nervous, don't volunteer all information at once. 1–3 sentences per response."""
+        "profile": """You are Sarah Chen, a 28-year-old graphic designer seeking contact lenses for the first time. Glasses Rx: -3.50 -0.75 x 180 OD, -4.00 -0.75 x 175 OS. You spend 10+ hours/day on screens; eyes feel dry and tired by late evening. No significant medical or ocular history. Wore glasses since age 12. You want contacts for convenience and weekend hiking. No known allergies. Answer as a real patient — conversational, slightly nervous, don't volunteer all information at once. Wait for the student to ask appropriate follow-up questions before sharing details. 1–3 sentences per response."""
     },
     "Marcus Webb — 42 y/o, presbyope": {
         "initials": "MW",
         "greeting": "Hi, I have an appointment. I've been wearing contacts for years but I'm having some issues lately.",
-        "profile": """You are Marcus Webb, a 42-year-old accountant who wore monthly soft lenses for years but now struggles with near vision and midday dryness. Distance Rx: -2.00 OU, Add: +1.75. Mild dry eye; use Systane Ultra occasionally. Had a red eye from extended wear once — cautious about overnight use. Take lisinopril and loratadine. Interested in multifocal options. Don't over-share; wait for questions. 1–3 sentences per response."""
+        "profile": """You are Marcus Webb, a 42-year-old accountant who wore monthly soft lenses for years but now struggles with near vision and midday dryness. Distance Rx: -2.00 OU, Add: +1.75. Mild dry eye; use Systane Ultra occasionally. Had a red eye from extended wear once — cautious about overnight use. Take lisinopril and loratadine. Interested in multifocal options. Don't over-share; wait for the student to ask appropriate questions before sharing details. 1–3 sentences per response."""
     },
     "Jordan Lee — 19 y/o, athlete": {
         "initials": "JL",
         "greeting": "Hi, I want to try contact lenses again — I play soccer and my glasses are a problem.",
-        "profile": """You are Jordan Lee, a 19-year-old college student and competitive soccer player. Rx: -2.50 -1.75 x 180 OD, -3.00 -2.00 x 175 OS. Tried soft lenses before — felt blurry and kept rotating. Want contacts for sports. Healthy, no medications. Budget is a concern; you'll bring it up if nobody asks. Prefer dailies. Be slightly impatient. 1–3 sentences per response."""
+        "profile": """You are Jordan Lee, a 19-year-old college student and competitive soccer player. Rx: -2.50 -1.75 x 180 OD, -3.00 -2.00 x 175 OS. Tried soft lenses before — felt blurry and kept rotating. Want contacts for sports. Healthy, no medications. Budget is a concern; you'll bring it up if directly asked about preferences or cost. Prefer dailies. Be slightly impatient. Don't volunteer all details at once — wait for appropriate follow-up questions. 1–3 sentences per response."""
     },
     "Linda Osei — 35 y/o, previous dropout": {
         "initials": "LO",
         "greeting": "Hi, I used to wear contacts but had to stop. I'm wondering if there's something better available now.",
-        "profile": """You are Linda Osei, a 35-year-old RN who stopped wearing contact lenses 2 years ago due to dryness and irritation during 12-hour hospital shifts. Wore biweekly soft lenses for 8 years. Told your tear film was borderline. Rx: -1.75 -0.50 x 90 OD, -2.25 -0.75 x 85 OS. A colleague told you about newer daily SiHy lenses; willing to try again but skeptical. No systemic conditions. Be guarded. 1–3 sentences per response."""
+        "profile": """You are Linda Osei, a 35-year-old RN who stopped wearing contact lenses 2 years ago due to dryness and irritation during 12-hour hospital shifts. Wore biweekly soft lenses for 8 years. Told your tear film was borderline. Rx: -1.75 -0.50 x 90 OD, -2.25 -0.75 x 85 OS. A colleague told you about newer daily SiHy lenses; willing to try again but skeptical. No systemic conditions. Be guarded and wait for the student to ask before sharing details. 1–3 sentences per response."""
+    },
+    "Derek Kim — 31 y/o, previous daily lens wearer": {
+        "initials": "DK",
+        "greeting": "Hi, I have an appointment — I'm hoping to talk about getting contact lenses.",
+        "profile": """You are Derek Kim, a 31-year-old IT project manager. You wore Acuvue Moist 1-Day lenses for 3 years in your mid-20s but stopped because reordering was inconvenient. You recently started recreational volleyball and your glasses keep slipping. Personal info: DOB August 22, 1993. Always answer demographic questions directly and cooperatively when asked — name, date of birth, occupation, phone, and address. You have seasonal rhinitis managed with fluticasone nasal spray. You had LASIK consultations twice but were told your corneas were too thin — this makes you slightly anxious. Rx: -4.25 -0.50 x 170 OD, -3.75 sphere OS. You wore dailies, no solution needed, about 10-12 hours/day. Stopped due to inconvenience not discomfort. Always answer demographic questions directly and cooperatively when asked. Don't volunteer medical info unless specifically asked. 1–3 sentences per response."""
     }
 }
 
-GRADED_PATIENT = {
-    "name": "Derek Kim",
-    "initials": "DK",
-    "greeting": "Hi, I have an appointment — I'm hoping to talk about getting contact lenses.",
-    "profile": """You are Derek Kim, a 31-year-old IT project manager. You wore Acuvue Moist 1-Day lenses for 3 years in your mid-20s but stopped because reordering was inconvenient. You recently started recreational volleyball and your glasses keep slipping. Personal info: DOB August 22, 1993. You have seasonal rhinitis managed with fluticasone nasal spray. You had LASIK consultations twice but were told your corneas were too thin — this makes you slightly anxious. Rx: -4.25 -0.50 x 170 OD, -3.75 sphere OS. You wore dailies, no solution needed, about 10-12 hours/day. Stopped due to inconvenience not discomfort. Always answer demographic questions directly and cooperatively when asked — name, date of birth, occupation, phone, and address. Don't volunteer medical info unless specifically asked. 1–3 sentences per response."""
-}
+COMPETENCY_ITEMS = [
+    "2a — Personal history (name, date of birth, occupation)",
+    "2b — Reasons for seeking contact lenses",
+    "2c — Medical health history (systemic conditions, allergies, medications)",
+    "2c — Visual/ocular health history",
+    "2d — Prior contact lens type and brand",
+    "2d — Prior wear time",
+    "2d — Prior lens care solutions used"
+]
 
 QUICK_PROMPTS = [
     "What brings you in today?",
@@ -47,16 +55,6 @@ QUICK_PROMPTS = [
     "What activities would contacts help with?",
     "What is your date of birth?",
     "What do you do for work?",
-]
-
-COMPETENCY_ITEMS = [
-    "2a — Recorded personal history (name, date of birth, occupation, etc.)",
-    "2b — Investigated reasons for seeking contact lenses",
-    "2c — Recorded medical health history (diabetes, allergies, arthritis, pregnancy, etc.)",
-    "2c — Recorded visual health history",
-    "2d — Recorded prior contact lens type and brand",
-    "2d — Recorded prior wear time",
-    "2d — Recorded prior lens care solutions used"
 ]
 
 def get_client():
@@ -73,24 +71,24 @@ def get_ai_response(system_prompt, messages):
     )
     return response.content[0].text
 
-def get_feedback(messages):
+def get_feedback(messages, patient_name):
     client = get_client()
     transcript = "\n".join([f"{'Student' if m['role'] == 'user' else 'Patient'}: {m['content']}" for m in messages])
-    prompt = f"""You are an optometry clinical instructor evaluating a student's simulated patient interview.
+    prompt = f"""You are an experienced optometry clinical instructor reviewing a student's patient interview practice session. The patient was {patient_name}.
 
-Competency items: {COMPETENCY_ITEMS}
+The following are the key areas a thorough subjective interview should cover:
+{json.dumps(COMPETENCY_ITEMS, indent=2)}
 
 Transcript:
 {transcript}
 
+Provide formative coaching feedback — not a score, grade, or pass/fail evaluation. Your feedback should help the student grow as a clinical interviewer.
+
 Respond ONLY with valid JSON, no markdown or code blocks:
 {{
-  "score": <0-100>,
-  "covered": [<items covered>],
-  "missed": [<items missed>],
-  "praise": "<1-2 sentences>",
-  "improvement": "<1-2 sentences>",
-  "tip": "<one specific tip>"
+  "explored_well": "<2-3 sentences identifying what the student did effectively in the interview>",
+  "missed_or_thin": "<2-3 sentences identifying important areas that were missed entirely or not explored thoroughly enough>",
+  "follow_up_suggestions": "<2-3 specific follow-up questions or interviewing considerations the student should keep in mind for next time>"
 }}"""
     response = client.messages.create(
         model="claude-haiku-4-5-20251001",
@@ -101,206 +99,132 @@ Respond ONLY with valid JSON, no markdown or code blocks:
     clean = raw.replace("```json", "").replace("```", "").strip()
     return json.loads(clean)
 
-def build_download_text(student_name, patient_name, mode, messages, fb, now, exchanges):
-    transcript = "\n\n".join([f"{'STUDENT' if m['role'] == 'user' else 'PATIENT'}: {m['content']}" for m in messages])
-    total = len(fb["covered"]) + len(fb["missed"])
-    pct = round(len(fb["covered"]) / total * 100) if total > 0 else 0
-    covered_lines = "\n".join(["COVERED: " + i for i in fb["covered"]])
-    missed_lines = "\n".join(["MISSED: " + i for i in fb["missed"]])
-    return f"""Subjective Interview Simulator
-{mode}
-{"Student: " + student_name if student_name else ""}
-Patient: {patient_name}
-Date: {now}
-Exchanges: {exchanges}
-
-SCORE: {fb["score"]}/100
-ITEMS COVERED: {len(fb["covered"])}/{total}
-COMPETENCY: {pct}%
-
-COMPETENCY CHECKLIST (2a-2d)
-{covered_lines}
-{missed_lines}
-
-FEEDBACK
-What you did well: {fb["praise"]}
-Areas to improve: {fb["improvement"]}
-Tip for next time: {fb["tip"]}
-
-TRANSCRIPT
-{transcript}"""
-
-def send_message(msg, session_key, system_prompt):
-    st.session_state[session_key].append({"role": "user", "content": msg})
-    reply = get_ai_response(system_prompt, st.session_state[session_key])
-    st.session_state[session_key].append({"role": "assistant", "content": reply})
-    if session_key == "practice_messages":
-        st.session_state.practice_feedback = None
+def send_message(msg):
+    patient = PATIENTS[st.session_state.selected_patient]
+    st.session_state.messages.append({"role": "user", "content": msg})
+    reply = get_ai_response(patient["profile"], st.session_state.messages)
+    st.session_state.messages.append({"role": "assistant", "content": reply})
+    st.session_state.feedback = None
     st.rerun()
+
+def reset_session(patient_name=None):
+    if patient_name:
+        st.session_state.selected_patient = patient_name
+    patient = PATIENTS[st.session_state.selected_patient]
+    st.session_state.messages = [{"role": "assistant", "content": patient["greeting"]}]
+    st.session_state.feedback = None
+    st.session_state.interview_ended = False
+
+# ── Session state init ──
+if "selected_patient" not in st.session_state:
+    st.session_state.selected_patient = list(PATIENTS.keys())[0]
+    st.session_state.messages = []
+    st.session_state.feedback = None
+    st.session_state.interview_ended = False
+    reset_session()
 
 # ── UI ──
 st.title("Subjective Interview Simulator")
-mode = st.radio("Select mode", ["Practice", "Graded Assignment"], horizontal=True)
+st.markdown("Approach this simulation as you would a real patient interview. Respond to what the patient tells you and use follow-up questions when appropriate. There is no required script or checklist — focus on having a natural clinical conversation.")
+st.markdown("---")
 
-# ══════════════════════════════════════════════
-# PRACTICE MODE
-# ══════════════════════════════════════════════
-if mode == "Practice":
-    st.markdown("---")
-    patient_name = st.selectbox("Choose a patient", list(PATIENTS.keys()))
-    patient = PATIENTS[patient_name]
+# ── Patient selector ──
+st.markdown("**Select a patient**")
+patient_name = st.selectbox("", list(PATIENTS.keys()), index=list(PATIENTS.keys()).index(st.session_state.selected_patient), label_visibility="collapsed")
 
-    if "practice_messages" not in st.session_state or st.session_state.get("practice_patient") != patient_name:
-        st.session_state.practice_messages = [{"role": "assistant", "content": patient["greeting"]}]
-        st.session_state.practice_patient = patient_name
-        st.session_state.practice_feedback = None
+if patient_name != st.session_state.selected_patient:
+    reset_session(patient_name)
+    st.rerun()
 
-    for msg in st.session_state.practice_messages:
-        with st.chat_message("assistant" if msg["role"] == "assistant" else "user"):
-            st.write(msg["content"])
+st.markdown("---")
 
+# ── Chat ──
+for msg in st.session_state.messages:
+    with st.chat_message("assistant" if msg["role"] == "assistant" else "user"):
+        st.write(msg["content"])
+
+# ── Input and prompts ──
+if not st.session_state.interview_ended:
     st.markdown("**Quick prompts**")
     cols = st.columns(2)
     for i, prompt_text in enumerate(QUICK_PROMPTS):
         if cols[i % 2].button(prompt_text, key=f"qp_{i}"):
-            send_message(prompt_text, "practice_messages", patient["profile"])
+            send_message(prompt_text)
 
     st.markdown("")
     if user_input := st.chat_input("Or type your own question…"):
-        send_message(user_input, "practice_messages", patient["profile"])
+        send_message(user_input)
 
     st.markdown("")
     col1, col2 = st.columns(2)
     with col1:
         if st.button("Start over", use_container_width=True):
-            st.session_state.practice_messages = [{"role": "assistant", "content": patient["greeting"]}]
-            st.session_state.practice_feedback = None
+            reset_session()
             st.rerun()
     with col2:
-        if st.button("Review my interview →", use_container_width=True, type="primary"):
-            user_msgs = [m for m in st.session_state.practice_messages if m["role"] == "user"]
+        if st.button("End interview & review feedback →", use_container_width=True, type="primary"):
+            user_msgs = [m for m in st.session_state.messages if m["role"] == "user"]
             if len(user_msgs) < 3:
-                st.warning("Ask a few more questions first.")
+                st.warning("Continue your interview a little longer before reviewing feedback.")
             else:
-                with st.spinner("Analyzing your interview…"):
-                    st.session_state.practice_feedback = get_feedback(st.session_state.practice_messages)
+                st.session_state.interview_ended = True
+                with st.spinner("Reviewing your interview…"):
+                    st.session_state.feedback = get_feedback(st.session_state.messages, patient_name)
+                st.rerun()
 
-    if st.session_state.get("practice_feedback"):
-        fb = st.session_state.practice_feedback
-        st.markdown("---")
-        st.subheader("Interview review")
-        total = len(fb["covered"]) + len(fb["missed"])
-        pct = round(len(fb["covered"]) / total * 100) if total > 0 else 0
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Score", f"{fb['score']}/100")
-        col2.metric("Items covered", f"{len(fb['covered'])}/{total}")
-        col3.metric("Competency", f"{pct}%")
-
-        st.markdown("**Competency checklist (2a–2d)**")
-        for item in fb["covered"]:
-            st.success(f"✓ {item}")
-        for item in fb["missed"]:
-            st.error(f"✗ {item}")
-
-        st.markdown(f"**What you did well:** {fb['praise']}")
-        st.markdown(f"**Areas to improve:** {fb['improvement']}")
-        st.markdown(f"**Tip for next time:** {fb['tip']}")
-        st.info("You can keep practicing and request feedback again at any time.")
-
-        now = datetime.now().strftime("%B %d, %Y at %I:%M %p")
-        exchanges = len([m for m in st.session_state.practice_messages if m["role"] == "user"])
-        download_text = build_download_text("", patient_name, "Practice Session", st.session_state.practice_messages, fb, now, exchanges)
-        st.download_button("Download transcript & feedback", data=download_text, file_name="opt273-practice-transcript.txt", mime="text/plain", use_container_width=True)
-
-# ══════════════════════════════════════════════
-# GRADED MODE
-# ══════════════════════════════════════════════
-else:
+# ── Feedback and transcript ──
+if st.session_state.interview_ended and st.session_state.feedback:
+    fb = st.session_state.feedback
     st.markdown("---")
+    st.subheader("Interview feedback")
 
-    if "graded_started" not in st.session_state:
-        st.session_state.graded_started = False
-        st.session_state.graded_submitted = False
-        st.session_state.graded_messages = []
-        st.session_state.graded_name = ""
-        st.session_state.graded_feedback = None
+    st.markdown("**What you explored effectively**")
+    st.success(fb["explored_well"])
 
-    if not st.session_state.graded_started:
-        st.markdown("### Graded Assignment")
-        st.markdown("You will conduct a complete patient interview with a new patient. At the end you will receive feedback and a submission record to upload to Canvas.")
-        st.markdown("""
-- No prompt suggestions — questions are up to you
-- Feedback and submission record generated at the end
-- Download your record to submit in Canvas
-        """)
-        name = st.text_input("Your name (for submission record)")
-        if st.button("Begin exam →", type="primary"):
-            if name:
-                st.session_state.graded_name = name
-                st.session_state.graded_started = True
-                st.session_state.graded_messages = [{"role": "assistant", "content": GRADED_PATIENT["greeting"]}]
-                st.rerun()
-            else:
-                st.warning("Please enter your name first.")
+    st.markdown("**Areas that were missed or could be explored further**")
+    st.warning(fb["missed_or_thin"])
 
-    elif not st.session_state.graded_submitted:
-        st.markdown(f"**Patient:** {GRADED_PATIENT['name']} · **Student:** {st.session_state.graded_name}")
+    st.markdown("**Suggestions for follow-up questions and interviewing considerations**")
+    st.info(fb["follow_up_suggestions"])
 
-        for msg in st.session_state.graded_messages:
-            with st.chat_message("assistant" if msg["role"] == "assistant" else "user"):
-                st.write(msg["content"])
+    st.markdown("---")
+    st.markdown("**Interview transcript**")
+    transcript = "\n\n".join([
+        f"{'STUDENT' if m['role'] == 'user' else 'PATIENT'}: {m['content']}"
+        for m in st.session_state.messages
+    ])
+    st.text_area("", transcript, height=300, label_visibility="collapsed")
 
-        if user_input := st.chat_input("Type your question…"):
-            send_message(user_input, "graded_messages", GRADED_PATIENT["profile"])
+    now = datetime.now().strftime("%B %d, %Y at %I:%M %p")
+    exchanges = len([m for m in st.session_state.messages if m["role"] == "user"])
+    download_text = f"""Subjective Interview Simulator
+Patient: {patient_name}
+Date: {now}
+Exchanges: {exchanges}
 
-        user_msgs = [m for m in st.session_state.graded_messages if m["role"] == "user"]
-        st.caption(f"{len(user_msgs)} exchanges")
+INTERVIEW FEEDBACK
 
-        if st.button("Submit & get feedback →", type="primary"):
-            if len(user_msgs) < 3:
-                st.warning("Please conduct your interview before submitting.")
-            else:
-                st.session_state.graded_submitted = True
-                st.rerun()
+What you explored effectively:
+{fb['explored_well']}
 
-    else:
-        st.markdown("### Submission record")
-        st.success("Interview submitted successfully.")
+Areas that were missed or could be explored further:
+{fb['missed_or_thin']}
 
-        if not st.session_state.graded_feedback:
-            with st.spinner("Generating feedback…"):
-                st.session_state.graded_feedback = get_feedback(st.session_state.graded_messages)
+Suggestions for follow-up questions and interviewing considerations:
+{fb['follow_up_suggestions']}
 
-        fb = st.session_state.graded_feedback
-        now = datetime.now().strftime("%B %d, %Y at %I:%M %p")
-        user_msgs = [m for m in st.session_state.graded_messages if m["role"] == "user"]
-        total = len(fb["covered"]) + len(fb["missed"])
-        pct = round(len(fb["covered"]) / total * 100) if total > 0 else 0
+TRANSCRIPT
+{transcript}"""
 
-        col1, col2 = st.columns(2)
-        col1.markdown(f"**Student:** {st.session_state.graded_name}")
-        col1.markdown(f"**Patient:** {GRADED_PATIENT['name']}")
-        col2.markdown(f"**Date:** {now}")
-        col2.markdown(f"**Exchanges:** {len(user_msgs)}")
+    st.download_button(
+        "Download transcript & feedback",
+        data=download_text,
+        file_name="interview-transcript.txt",
+        mime="text/plain",
+        use_container_width=True
+    )
 
-        st.markdown("---")
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Score", f"{fb['score']}/100")
-        col2.metric("Items covered", f"{len(fb['covered'])}/{total}")
-        col3.metric("Competency", f"{pct}%")
-
-        st.markdown("**Competency checklist (2a–2d)**")
-        for item in fb["covered"]:
-            st.success(f"✓ {item}")
-        for item in fb["missed"]:
-            st.error(f"✗ {item}")
-
-        st.markdown(f"**What you did well:** {fb['praise']}")
-        st.markdown(f"**Areas to improve:** {fb['improvement']}")
-        st.markdown(f"**Tip for next time:** {fb['tip']}")
-
-        st.markdown("---")
-        download_text = build_download_text(st.session_state.graded_name, GRADED_PATIENT["name"], "Graded Assignment", st.session_state.graded_messages, fb, now, len(user_msgs))
-        filename = f"opt273-graded-{st.session_state.graded_name.replace(' ', '-').lower()}.txt"
-        st.download_button("Download submission record", data=download_text, file_name=filename, mime="text/plain", use_container_width=True)
-        st.caption("Download and upload this file to your Canvas assignment submission.")
+    st.markdown("")
+    if st.button("Start another patient encounter →", use_container_width=True):
+        reset_session()
+        st.rerun()
