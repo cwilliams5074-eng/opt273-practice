@@ -141,7 +141,9 @@ for msg in st.session_state.messages:
 
 # ── Input and prompts ──
 if not st.session_state.interview_ended:
-    st.markdown("**Quick prompts**")
+    st.markdown(" ")
+    st.markdown("---")
+    st.markdown("**Suggested questions**")
     cols = st.columns(2)
     for i, prompt_text in enumerate(QUICK_PROMPTS):
         if cols[i % 2].button(prompt_text, key=f"qp_{i}"):
